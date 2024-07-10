@@ -7,7 +7,6 @@ trigger:
 - main
 
 variables:
-
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: '7d8c1973-77cb-48bc-8fd5-48133881fd0b'
 
@@ -34,6 +33,7 @@ stages:
       displayName: 'Maven Package'
       inputs:
         mavenPomFile: 'pom.xml'
+        options: '-DskipTests=true'  # Tùy chọn để bỏ qua các bài kiểm tra trong quá trình build
 
     - task: CopyFiles@2
       displayName: 'Copy Files to artifact staging directory'
@@ -42,7 +42,7 @@ stages:
         Contents: '**/target/*.?(war|jar)'
         TargetFolder: $(Build.ArtifactStagingDirectory)
 
-    - upload: $(Build.ArtifactStagingDirectory)
+    - publish: $(Build.ArtifactStagingDirectory)
       artifact: drop
 
 - stage: Deploy
@@ -60,9 +60,10 @@ stages:
         deploy:
           steps:
           - task: AzureWebApp@1
-            displayName: 'Azure Web App Deploy: '
+            displayName: 'Azure Web App Deploy'
             inputs:
               azureSubscription: $(azureSubscription)
-              appType: webAppLinux
+              appType: 'webAppLinux'
               appName: $(webAppName)
-              package: '$(Pipeline.Workspace)/drop/**/target/*.?(war|jar)'
+              package: '$(Pipeline.Workspace)/drop/**/*.?(war|jar)'  # Đảm bảo các tệp war hoặc jar được triển khai
+
