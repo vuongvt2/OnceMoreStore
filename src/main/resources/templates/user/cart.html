@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+      lang="en">
+<div th:replace="/fragments/header :: header"/>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+        }
+
+        .cart-details h5, .cart-price {
+            margin: 0;
+        }
+
+        .cart-details p {
+            margin: 5px 0 0 0;
+        }
+
+        .cart-total {
+            margin-top: 20px;
+        }
+
+        .total-heading {
+            font-weight: bold;
+        }
+
+        .total-divider {
+            border-top: 3px solid #000;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .cart-total table {
+            width: 100%;
+        }
+
+        .cart-total td {
+            padding: 5px 0;
+        }
+
+        .cart-total td:first-child {
+            font-weight: normal;
+        }
+
+        .cart-total td:last-child {
+            font-weight: bold;
+        }
+
+        .footer h5 {
+            margin-bottom: 20px;
+        }
+
+        .footer ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        .footer ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .footer ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .text-center {
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <h2>Your Cart</h2>
+    <div class="cart-item row align-items-center my-4" th:if="${cartDTO != null and cartDTO.cartItemDTOList != null}"
+         th:each="cartItem : ${cartDTO.cartItemDTOList}">
+        <div class="col-2">
+            <!--            <img src="https://via.placeholder.com/100" alt="Barcelona 2010-2011" class="img-fluid">-->
+            <img class="img-fluid"
+                 th:src="@{/static/images/{imageName}(imageName=${!#strings.isEmpty(cartItem.url) ? cartItem.url : 'ao1.png'})}"
+                 alt="Product Image">
+        </div>
+        <div class="col-6">
+            <!--            <h5 th:text="${cartItem.nameProduct}">Barcelona 2010-2011</h5>-->
+            <!--            <p th:text="${'Description: ' + cartItem.description}">Colour: Shown Blue/Scarlet</p>-->
+            <!--            <p th:text="${'Size: '}"></p>-->
+            <!--            <p th:text="${'Quantity: ' + cartItem.quantity }"></p><br>-->
+            <!--            <p th:text="${'Price: ' + cartItem.price }"></p><br>-->
+
+            <p>
+                <span th:text="${cartItem.nameProduct}">Shown Blue/Scarlet</span><br>
+                <span th:text="${'Description: ' + cartItem.description}"></span><br>
+                <span th:text="${'Quantity: ' + cartItem.quantity }"></span><br>
+                <span th:text="${'Price: ' + cartItem.price+ ' VND' }"></span>
+            </p>
+
+        </div>
+        <div class="col-2 text-right">
+            <p th:text="${cartItem.quantity * cartItem.price + ' VND'}" class="item-price"><span></span></p>
+        </div>
+        <div class="col-2 text-right">
+            <a href="#" th:data-product-id="${cartItem.productId}" class="delete-item"><i class="fas fa-trash-alt"></i></a>
+        </div>
+    </div>
+    <div class="cart-total">
+        <h5 class="total-heading">Total</h5>
+        <hr class="total-divider">
+        <table class="table">
+            <tbody>
+            <tr>
+                <td>Total amount</td>
+<!--                th:text="${cartDTO.totalPrice + ' VND'}"-->
+                <td class="text-right" id="total-amount" >1,500,000đ</td>
+            </tr>
+            <tr>
+                <td>Shipping cost</td>
+                <td class="text-right" >0đ</td>
+            </tr>
+            <tr>
+                <td><strong>Total payment</strong></td>
+                <td class="text-right" id="total-payment"><strong>1,500,000đ</strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <button class="btn btn-dark btn-block my-4" onclick="continuePayment()">Continue payment</button>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Hàm tính tổng tiền giỏ hàng
+        function updateCartTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-price').forEach(function (item) {
+                let price = parseFloat(item.innerText.replace(' VND', '').replace(/,/g, ''));
+                total += price;
+            });
+
+            let totalAmountElement = document.getElementById('total-amount');
+            let totalPaymentElement = document.getElementById('total-payment');
+
+            totalAmountElement.innerText = total.toLocaleString('vi-VN') + ' VND';
+            totalPaymentElement.innerText = total.toLocaleString('vi-VN') + ' VND';
+        }
+
+        // Gọi hàm updateCartTotal khi trang vừa tải lên
+        updateCartTotal();
+
+        // Xử lý sự kiện xóa mục giỏ hàng
+        document.querySelectorAll('.delete-item').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                let cartItem = this.closest('.cart-item');
+                let productId = this.getAttribute('data-product-id');
+
+                // Gửi yêu cầu tới BE để xoá sản phẩm
+                fetch(`/shoppingCart/removeProduct/${productId}`, {
+                    method: 'GET'
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        if (data === "00") {
+                            // Xoá phần tử khỏi DOM
+                            cartItem.remove();
+                            updateCartTotal();
+                        } else {
+                            alert('Failed to remove the product from cart.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+
+    function continuePayment() {
+            window.location.href = '/shoppingCart/view-order';
+    }
+</script>
+
+<div th:replace="/fragments/footer :: footer"/>
+</body>
+</html>

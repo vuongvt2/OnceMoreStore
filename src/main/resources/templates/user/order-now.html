@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html"
+      lang="en">
+<div th:replace="/fragments/header :: header"/>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        .product-image {
+            max-width: 200px; /* Increased width */
+        }
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-info img {
+            margin-right: 20px;
+        }
+        .totals {
+            margin-top: 20px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        header nav a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        header .icons a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        header .icons a i {
+            font-size: 18px;
+        }
+
+        h2, h3 {
+            font-weight: bold;
+        }
+
+        .img-fluid {
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        .payment-summary p {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /*.payment-summary p span {*/
+        /*    float: left;*/
+        /*}*/
+
+        button {
+            cursor: pointer;
+        }
+
+        .product {
+            margin-bottom: 20px;
+        }
+
+        .payment-methods {
+            text-align: center;
+        }
+
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-control input[type="number"] {
+            width: 60px;
+            text-align: center;
+        }
+
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            margin: 0 5px;
+        }
+
+        .quantity-control .quantity-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .voucher-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .voucher-group input {
+            margin-right: 10px;
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="text-center">INFORMATION LINE</h2>
+    <div id="product-list">
+        <div class="product-info border-bottom py-3" th:if="${cartDTO != null and cartDTO.cartItemDTOList != null}"
+             th:each="cartItem : ${cartDTO.cartItemDTOList}">
+            <input id="productId" type="hidden" th:value="${cartItem.productId}">
+            <input id="price" type="hidden" th:value="${cartItem.price}">
+            <div class="d-flex">
+                <img  th:src="@{/static/images/{imageName}(imageName=${!#strings.isEmpty(cartItem.url) ? cartItem.url : 'ao1.png'})}"
+                      class="product-image" alt="Product Image">
+                <div>
+                    <h5 th:text="${cartItem.nameProduct}">Nike Court Legacy Lift</h5>
+                    <p> <span th:text="${'Description: ' + cartItem.description}"></span><br>
+                        <span th:id="'price-id-' + ${cartItem.productId}" th:data-price-product="${cartItem.price}"
+                              th:text="${'Price: ' + cartItem.price+ ' VND' }"></span>
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <p>Quantity</p>
+
+                    <div class="quantity-control">
+                        <button class="btn btn-secondary quantity-btn" th:data-product-id="${cartItem.productId}" onclick="changeQuantity(this, -1)">
+                            -
+                        </button>
+
+
+                        <input type="hidden" th:id="'quantity-max-' + ${cartItem.productId}" th:value="${cartItem.maxQuantity}">
+                        <input th:data-quantity="${cartItem.productId}" th:data-product-id="${cartItem.productId}" th:id="'quantity-input-' + ${cartItem.productId}"
+                               type="text"
+                               class="form-control"
+                               th:value="${cartItem.quantity}"
+                               oninput="validateInput(this)"
+                               onkeypress="return isNumberKey(event, this)">
+                        <button class="btn btn-secondary quantity-btn" th:data-product-id="${cartItem.productId}" onclick="changeQuantity(this, 1)">+</button>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <p>Voucher code</p>
+                    <div class="voucher-group">
+                        <input type="text" class="form-control" placeholder="Type here">
+                        <button class="btn btn-primary">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="totals">
+        <div class="d-flex justify-content-between py-2">
+            <span>Discount</span>
+            <span>0đ</span>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+            <span>Ship</span>
+            <span>0đ</span>
+        </div>
+        <div class="d-flex justify-content-between py-2 font-weight-bold">
+            <span>Total</span>
+            <span id="total-order">660,000đ</span>
+        </div>
+    </div>
+
+    <section class="row">
+        <div class="col-md-6">
+            <h3>Shipment Details</h3>
+            <form>
+                <div class="form-group">
+                    <label for="receiverName">First and last name</label>
+                    <input type="text" id="receiverName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Enter the phone number of the consignee</label>
+                    <input type="tel" id="phone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="email">Your email</label>
+                    <input type="email" id="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="address">Enter your address</label>
+                    <input type="text" id="address" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes (optional)</label>
+                    <textarea id="notes" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h3>Payment methods</h3>
+            <div class="form-group">
+                <button id="paymentOnDeliveryBtn" class="btn btn-dark mr-3">Payment on delivery</button>
+                <button id="bankTransferBtn" class="btn btn-outline-dark">Bank transfer</button>
+                <input id="isPayment" type="hidden" value="false">
+            </div>
+
+            <div class="payment-summary">
+                <p><span>Total amount of goods: </span> <span id="total-amount">660,000đ</span></p>
+                <p><span>Discount: </span> <span>0đ</span></p>
+                <p><span>Total payment:</span><span id="total-payment">660,000đ</span></p>
+                <input type="hidden" id="amount">
+            </div>
+
+            <button class="btn btn-dark btn-block" onclick="handlePayment()">Payment</button>
+        </div>
+    </section>
+
+</div>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+    $(document).ready(function () {
+        $('.thumbnail img').on('click', function () {
+            const targetCarousel = $(this).data('target');
+            const slideTo = $(this).data('slide-to');
+            $(targetCarousel).carousel(slideTo);
+        });
+        // thêm sp vào giỏ hàng
+        document.querySelectorAll('.add-product-item').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                let productId = $('#productId').attr('data-product-id');
+                let quantity = $('#quantity-input').val();
+
+                // Gửi yêu cầu tới BE để xoá sản phẩm
+                fetch(`/shoppingCart/addProduct/${productId}?quantity=${quantity}`, {
+                    method: 'GET'
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        Toastify({
+                            text: data,
+                            duration: 3000,
+                            close: true,
+                            gravity: "top", // `top` or `bottom`
+                            position: "right", // `left`, `center` or `right`
+                            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                        }).showToast();
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+
+
+        calculateTotalPrice();
+    });
+
+    function handlePayment() {
+        if ($('#receiverName').val() == '' || $('#phone').val() == ''
+            || $('#email').val() == '' || $('#address').val() == '') {
+            Toastify({
+                text: 'Vui lòng nhập đủ thông tin!',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ffcc00, #ff9900)",
+            }).showToast();
+            return;
+        }
+        const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const email = $('#email').val();
+        if (!regexEmail.test(String(email).toLowerCase())) {
+            Toastify({
+                text: 'Email không hợp lệ!',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ffcc00, #ff9900)",
+            }).showToast();
+            return;
+        }
+        const orderDTO = {
+            address: $('#address').val(),
+            phone: $('#phone').val(),
+            receiverName: $('#receiverName').val(),
+            amount: parseFloat($('#amount').val()),
+            isPayment: $('#isPayment').val(),
+            orderDetailDTOList: []
+        };
+
+
+        $('.product-info').each(function() {
+            let productId = $(this).find('#productId').val();
+            let price = $(this).find('#price').val();
+            let quantity = $(this).find('[id^=quantity-input-]').val();
+
+            let orderDetailDTO = {
+                productId: productId,
+                quantity: quantity,
+                price: price
+            };
+
+            orderDTO.orderDetailDTOList.push(orderDetailDTO);
+        });
+
+        const xhr = new XMLHttpRequest();
+        const url = '/process-order-now';
+        const jsonData = JSON.stringify(orderDTO);
+
+
+        console.log('Sending order DTO:', jsonData);
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const responseText = xhr.responseText;
+                const response = JSON.parse(responseText);
+                console.log(responseText);
+                debugger;
+                if (response.resultCode === '00') {
+                    debugger;
+                    if (response.payment) {
+                        const amount = response.amount;
+                        window.location.href = `/api/v1/payment/vn-pay?amount=${amount}&bankCode=NCB`;
+                    } else {
+                        console.log('Order processed successfully');
+                        Toastify({
+                            text: 'Thành công!',
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                        }).showToast();
+
+                        window.location.href = '/success';
+                    }
+
+                } else if (response.resultCode === '01') {
+                    console.error('Order processing failed');
+                    Toastify({
+                        text: 'Thất bại',
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }).showToast();
+                } else {
+                    console.error('Unexpected response from server:', responseText);
+                    // Xử lý trường hợp phản hồi không xác định
+                }
+            } else {
+                console.error('Request failed with status:', xhr.status);
+                Toastify({
+                    text: 'Thất bại',
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                }).showToast();
+            }
+        };
+
+        xhr.onerror = function() {
+            console.error('Request failed');
+            // Xử lý khi có lỗi xảy ra trong quá trình gửi yêu cầu
+        };
+
+        xhr.send(jsonData);
+
+        // const url = '/process-order';
+        // $.ajax({
+        //     url:url,
+        //     method: 'POST',
+        //     contentType: 'application/json',
+        //     data: JSON.stringify(orderDTO),
+        //     success: function(data) {
+        //         console.log('Response from backend:', data);
+        //         // Xử lý phản hồi từ backend ở đây nếu cần thiết
+        //     },
+        //     error: function(error) {
+        //         console.error('Error sending order to backend:', error);
+        //         // Xử lý lỗi nếu có
+        //     }
+        // });
+    }
+
+    function calculateTotalPrice() {
+        let totalPrice = 0;
+        const productElements = document.querySelectorAll('.product-info');
+        productElements.forEach(function(productElement) {
+            // const productId = productElement.querySelector('[data-product-id]').getAttribute('th:data-product-id');
+            const priceElement = productElement.querySelector('[data-price-product]');
+            const price = parseFloat(priceElement.getAttribute('data-price-product'));
+            const quantityElement = productElement.querySelector('[data-quantity]');
+            let quantity = parseInt(quantityElement.value);
+            if (isNaN(quantity)) {
+                quantity = 1;
+            }
+            totalPrice += price * quantity;
+        });
+        console.log("giá: " + totalPrice);
+        $('#total-order').text(totalPrice.toLocaleString('vi-VN') + ' VND');
+        $('#total-amount').text(totalPrice.toLocaleString('vi-VN') + ' VND');
+        $('#amount').val(totalPrice);
+        $('#total-payment').text(totalPrice.toLocaleString('vi-VN') + ' VND');
+        return totalPrice;
+    }
+
+    document.querySelectorAll('.size-option').forEach(function (label) {
+        label.addEventListener('click', function () {
+            document.querySelectorAll('.size-option').forEach(function (item) {
+                item.classList.remove('active');
+            });
+            label.classList.add('active');
+            label.querySelector('input').checked = true;
+        });
+    });
+
+    function changeQuantity(button, amount) {
+        debugger
+        const productId = button.getAttribute('data-product-id');
+        console.log(productId)
+        const input = document.getElementById('quantity-input-' + productId);
+        const maxQuantityInput = document.getElementById('quantity-max-' + productId);
+        const maxQuantity = parseInt(maxQuantityInput.value);
+        let value = parseInt(input.value);
+        if (isNaN(value)) {
+            value = 1;
+        }
+        value += amount;
+        if (value < 1) {
+            value = 1;
+        }
+        if (value > maxQuantity) {
+            value = maxQuantity;
+            showNotiMaxProduct(maxQuantity);
+        }
+        input.value = value;
+        calculateTotalPrice();
+    }
+
+    function showNotiMaxProduct(maxQuantity) {
+        Toastify({
+            text: 'Còn tối đa ' + maxQuantity + ' sản phẩm',
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
+    }
+
+    function validateInput(button) {
+        const productId = button.getAttribute('data-product-id');
+        const input = document.getElementById('quantity-input-' + productId);
+        const maxQuantityInput = document.getElementById('quantity-max-' + productId);
+        const maxQuantity = parseInt(maxQuantityInput.value);
+        let value = parseInt(input.value);
+        if (isNaN(value) || value < 1) {
+            input.value = '';
+        } else if (value > maxQuantity) {
+            showNotiMaxProduct(maxQuantity);
+            input.value = maxQuantity;
+        }
+        calculateTotalPrice();
+    }
+
+
+    function isNumberKey(evt, productId) {
+        const charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    //  click  nút "Payment on delivery"
+    $('#paymentOnDeliveryBtn').click(function() {
+        // Xử lý khi click vào nút "Payment on delivery"
+        if (!$(this).hasClass('active')) {
+            $(this).addClass('active').removeClass('btn-outline-dark').addClass('btn-dark');
+            $('#bankTransferBtn').removeClass('active').removeClass('btn-dark').addClass('btn-outline-dark');
+            $('#isPayment').val('false'); // Chưa chọn "Payment on delivery"
+        }
+    });
+
+    //  click  nút "Bank transfer"
+    $('#bankTransferBtn').click(function() {
+        // Xử lý khi click vào nút "Bank transfer"
+        if (!$(this).hasClass('active')) {
+            $(this).addClass('active').removeClass('btn-outline-dark').addClass('btn-dark');
+            $('#paymentOnDeliveryBtn').removeClass('active').removeClass('btn-dark').addClass('btn-outline-dark');
+            $('#isPayment').val('true'); // Đã chọn "Bank transfer"
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const phoneInput = document.getElementById("phone");
+
+        phoneInput.addEventListener("input", function() {
+            phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
+        });
+    });
+</script>
+<div th:replace="/fragments/footer :: footer"/>
+</body>
+</html>
