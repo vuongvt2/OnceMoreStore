@@ -22,7 +22,7 @@ jobs:
           java-version: '11'
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean package
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -58,4 +58,4 @@ jobs:
         with:
           app-name: 'oncemoreshopvn'
           slot-name: 'Production'
-          package: 'target/*.jar'
+          package: '*.jar'
