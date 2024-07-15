@@ -217,12 +217,12 @@
 <!--                <img  th:src="@{/static/images/{imageName}(imageName=${!#strings.isEmpty(cartItem.url) ? cartItem.url : 'ao1.png'})}"-->
 <!--                      class="product-image" alt="Product Image">-->
 
-                <th:block th:unless="cartItem.url == null or cartItem.url == ''">
-                    <img  th:src="@{/static/images/ao1.png}" class="product-image" alt="Product Image">
-                </th:block>
-                <th:block th:if="cartItem.url == null or cartItem.url == ''">
-                    <img  th:src="@{${'/static/images/' + cartItem.url}}"  class="product-image" alt="Product Image">
-                </th:block>
+<!--                <th:block th:unless="cartItem.url == null or cartItem.url == ''">-->
+<!--                    <img  th:src="@{/static/images/ao1.png}" class="product-image" alt="Product Image">-->
+<!--                </th:block>-->
+<!--                <th:block th:if="cartItem.url == null or cartItem.url == ''">-->
+<!--                    <img  th:src="@{${'/static/images/' + cartItem.url}}"  class="product-image" alt="Product Image">-->
+<!--                </th:block>-->
                 <div>
                     <h5 th:text="${cartItem.nameProduct}">Nike Court Legacy Lift</h5>
                     <p> <span th:text="${'Description: ' + cartItem.description}"></span><br>
