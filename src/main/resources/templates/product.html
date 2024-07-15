@@ -1,7 +1,112 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-<div th:replace="/fragments/header :: header"/>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnceMore Store</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css" integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" type="text/css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <style>
+        .navbar-custom {
+            background-color: #f8f9fa00;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: #000 !important;
+        }
+
+        .dropdown-menu a {
+            color: #000 !important;
+        }
+
+        .navbar-icons {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-icons i {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+        <div class="container">
+
+            <a class="navbar-brand" sec:authorize="!hasRole('ROLE_ADMIN')" th:href="@{/home}">ONCE MORE</a>
+            <a class="navbar-brand" sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/products}">ONCE MORE</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About us</a>
+                    </li>
+                    <!--                    <li class="nav-item dropdown">-->
+                    <!--                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"-->
+                    <!--                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                    <!--                            MEN-->
+                    <!--                        </a>-->
+                    <!--                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
+                    <!--                            <a class="dropdown-item" href="#">Action</a>-->
+                    <!--                            <a class="dropdown-item" href="#">Another action</a>-->
+                    <!--                        </div>-->
+                    <!--                    </li>-->
+                    <!--                    <li class="nav-item dropdown">-->
+                    <!--                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"-->
+                    <!--                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                    <!--                            WOMEN-->
+                    <!--                        </a>-->
+                    <!--                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">-->
+                    <!--                            <a class="dropdown-item" href="#">Action</a>-->
+                    <!--                            <a class="dropdown-item" href="#">Another action</a>-->
+                    <!--                        </div>-->
+                    <!--                    </li>-->
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/admin/create-product}">Create Product</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/admin/products}">Products</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_USER')">
+                        <a class="nav-link" href="#">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/logout}">Logout</a>
+                        <a class="nav-link" sec:authorize="!isAuthenticated()" th:href="@{/login}">Login</a>
+                    </li>
+                </ul>
+                <div class="navbar-icons">
+                    <i class="fa fa-address-book"></i>
+                    <a th:href="@{/shoppingCart/view-cart}" sec:authorize="hasRole('ROLE_USER')">
+                        <i class="fa fa-shopping-cart"></i>
+                    </a>
+                    <i class="fa fa-bell"></i>
+                    <i class="fas fa-user"></i>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 
 <head>
     <meta charset="UTF-8">
@@ -261,6 +366,39 @@
 
 </script>
 </body>
-<div th:replace="/fragments/footer :: footer"/>
-
+<!--<div th:replace="/fragments/footer :: footer"/>-->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>Customer Support</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white">Customer care</a></li>
+                    <li><a href="#" class="text-white">FAQ</a></li>
+                    <li><a href="#" class="text-white">Shipping guides</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Policy Only</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white">Warranty</a></li>
+                    <li><a href="#" class="text-white">Exchange policy</a></li>
+                    <li><a href="#" class="text-white">Information security</a></li>
+                    <li><a href="#" class="text-white">Delivery policy</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>About Us</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-white">News</a></li>
+                    <li><a href="#" class="text-white">Career</a></li>
+                    <li><a href="#" class="text-white">Investors</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <small>CONTACT<br>Email: contact@oncemore.com<br>Phone: +84 368988258</small>
+        </div>
+    </div>
+</footer>
 </html>
