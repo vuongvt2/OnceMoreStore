@@ -58,5 +58,4 @@ jobs:
         with:
           app-name: 'oncemoreshopvn'
           slot-name: 'Production'
-          package: '*.jar'
-          
+          package: 'target/*.jar'

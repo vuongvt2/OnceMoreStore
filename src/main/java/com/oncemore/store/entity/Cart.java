@@ -26,7 +26,7 @@ public class Cart {
 //    @JoinColumn(name = "UserId", referencedColumnName = "Id", unique = true)
 //    private User user;
 
-    @Column(name = "userId", unique = true)
+    @Column(name = "UserId", unique = true)
     private UUID userId;
 
     @Column(name = "Amount", nullable = false)
