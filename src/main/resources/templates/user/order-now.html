@@ -214,8 +214,8 @@
             <input id="productId" type="hidden" th:value="${cartItem.productId}">
             <input id="price" type="hidden" th:value="${cartItem.price}">
             <div class="d-flex">
-<!--                <img  th:src="@{/static/images/{imageName}(imageName=${!#strings.isEmpty(cartItem.url) ? cartItem.url : 'ao1.png'})}"-->
-<!--                      class="product-image" alt="Product Image">-->
+                <img  th:src="@{/static/images/{imageName}(imageName=${!#strings.isEmpty(cartItem.url) ? cartItem.url : 'ao1.png'})}"
+                      class="product-image" alt="Product Image">
 
 <!--                <th:block th:unless="cartItem.url == null or cartItem.url == ''">-->
 <!--                    <img  th:src="@{/static/images/ao1.png}" class="product-image" alt="Product Image">-->
