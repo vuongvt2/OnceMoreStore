@@ -57,7 +57,7 @@ public class ProductController {
     public String showProduct(Model model, @ModelAttribute("toastMessage") String toastMessage) {
         List<Product> products = productService.findAll();
         model.addAttribute("products", products);
-        return "/admin/products";
+        return "admin/products";
     }
 
     @GetMapping("/admin/product/delete/{id}")
@@ -72,7 +72,7 @@ public class ProductController {
     public String updateProduct(@PathVariable("id") UUID id, Model model, @ModelAttribute("toastMessage") String toastMessage) {
         Product product = productService.findById(id);
         if (Objects.isNull(product)) {
-            return "/error/404";
+            return "error/404";
         }
         List<Category> categories = categoryService.findAll();
         model.addAttribute("product", product);

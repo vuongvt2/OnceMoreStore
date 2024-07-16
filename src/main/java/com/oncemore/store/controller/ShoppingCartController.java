@@ -37,7 +37,7 @@ public class ShoppingCartController {
     public String viewCart(Model model) {
         CartDTO cartDTO = shoppingCartService.viewCart();
         model.addAttribute("cartDTO", cartDTO);
-        return "/user/cart";
+        return "user/cart";
     }
 
     @GetMapping("/shoppingCart/removeProduct/{productId}")
@@ -55,7 +55,7 @@ public class ShoppingCartController {
     public String order(Model model) {
         CartDTO cartDTO = shoppingCartService.viewCart();
         model.addAttribute("cartDTO", cartDTO);
-        return "/user/order";
+        return "user/order";
     }
 
     @PostMapping("/process-order")
@@ -74,7 +74,7 @@ public class ShoppingCartController {
 
     @GetMapping("/success")
     public String success() {
-        return "/user/success";
+        return "user/success";
     }
 
     @GetMapping("/shoppingCart/buyNow/{productId}")
@@ -87,7 +87,7 @@ public class ShoppingCartController {
             return "redirect:/home";
         }
         model.addAttribute("cartDTO", cartDTO);
-        return "/user/order-now";
+        return "user/order-now";
     }
 
 
