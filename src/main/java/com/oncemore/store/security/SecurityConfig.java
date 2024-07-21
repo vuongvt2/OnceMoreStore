@@ -31,12 +31,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/static/**","/css/**", "/js/**", "/images/**").permitAll()
-                .antMatchers("/home", "/registration", "/error", "/login").permitAll()
-                .antMatchers("/init/**","/api/v1/payment/**").permitAll()
+                .antMatchers("/static/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .antMatchers("/register","/register-user", "/home", "/registration", "/error", "/login").permitAll()
+                .antMatchers("/init/**", "/api/v1/payment/**").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/shoppingCart/**","/process-order/**",
-                        "/process-order-now/**","/user/product/detail/**","/shoppingCart/**/**").hasRole("USER")
+                .antMatchers("/shoppingCart/**", "/process-order/**",
+                        "/process-order-now/**", "/user/product/detail/**", "/shoppingCart/**/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()
