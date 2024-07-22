@@ -21,17 +21,17 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "left join ProductImage pi on p.id = pi.productId and pi.isPrimary = :active where p.status = :active and p.quantity > 0")
     List<ProductDTO> getAllProductBy(@Param("active") boolean active);
 
-    @Query("SELECT new com.oncemore.store.dto.ProductDTO ( p.id, p.name, p.price, pi.url) FROM Product p " +
+    @Query("SELECT DISTINCT new com.oncemore.store.dto.ProductDTO ( p.id, p.name, p.price, pi.url) FROM Product p " +
             " left JOIN ProductCategory pc ON p.id = pc.productId " +
             " left JOIN Category c ON pc.categoryId = c.id " +
             " left join ProductImage pi on p.id = pi.productId and pi.isPrimary = :active " +
             " WHERE " +
             " (:minPrice IS NULL OR p.price >= :minPrice)" +
-            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) AND (:categoryId IS NULL OR pc.categoryId = :categoryId)")
-
+            " AND (:maxPrice IS NULL OR p.price <= :maxPrice) AND (:categoryId IS NULL OR pc.categoryId = :categoryId) " +
+            " AND p.status = :active ")
     List<ProductDTO> filterByCategoryAndPrice(@Param("categoryId") UUID categoryId,
-                                           @Param("minPrice") BigDecimal minPrice,
-                                           @Param("maxPrice") BigDecimal maxPrice,
+                                              @Param("minPrice") BigDecimal minPrice,
+                                              @Param("maxPrice") BigDecimal maxPrice,
                                               @Param("active") boolean active);
 
 }
